@@ -2,9 +2,8 @@ name: AmiAmi Auto Scraper
 
 on:
   schedule:
-    # Chạy tự động vào phút thứ 0 của mỗi giờ (1 tiếng chạy 1 lần)
     - cron: '0 * * * *'
-  workflow_dispatch: # Cho phép bấm nút chạy thử bằng tay bất cứ lúc nào
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -26,6 +25,8 @@ jobs:
           playwright install-deps chromium
 
       - name: 4. Chạy Bot quét AmiAmi
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python bot.py
 
       - name: 5. Lưu cập nhật file Database (figures.db) lại vào GitHub
