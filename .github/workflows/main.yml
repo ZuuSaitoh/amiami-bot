@@ -1,0 +1,36 @@
+name: AmiAmi Auto Scraper
+
+on:
+  schedule:
+    # Chạy tự động vào phút thứ 0 của mỗi giờ (1 tiếng chạy 1 lần)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Cho phép bấm nút chạy thử bằng tay bất cứ lúc nào
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Tải code từ kho chứa về máy ảo
+        uses: actions/checkout@v4
+
+      - name: 2. Cài đặt Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 3. Cài đặt các thư viện và trình duyệt Playwright
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: 4. Chạy Bot quét AmiAmi
+        run: python bot.py
+
+      - name: 5. Lưu cập nhật file Database (figures.db) lại vào GitHub
+        run: |
+          git config --global user.name "AmiAmi Bot"
+          git config --global user.email "bot@github.com"
+          git add figures.db
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Cập nhật dữ liệu figure mới" && git push)
